@@ -95,17 +95,21 @@ export class Browser extends EventEmitter {
                 })
             }
 
+            const receiveTime = Date.now()
+
             Object.keys(nameMap).forEach(function (name) {
                 // unregister all services shutting down
                 self.goodbyes(name, packet).forEach(self.removeService.bind(self))
 
                 // register all new services
-                var matches = self.buildServicesFor(name, packet, self.txt, rinfo)
+                var matches = self.buildServicesFor(name, packet, self.txt, rinfo, receiveTime)
                 if (matches.length === 0) return
 
                 matches.forEach((service: Service) => {
                     const existingService = self._services.find((s) => dnsEqual(s.fqdn, service.fqdn))
                     if (existingService) {
+                        // @ts-expect-error Types are wrong here
+                        existingService.lastSeen = service.lastSeen
                         self.updateServiceSrv(existingService, service)
                         self.updateServiceTxt(existingService, service)
                         return
@@ -217,7 +221,7 @@ export class Browser extends EventEmitter {
     // https://tools.ietf.org/html/rfc6763#section-7.1
     //  Selective Instance Enumeration (Subtypes)
     //
-    private buildServicesFor(name: string, packet: any, txt: KeyValue, referer: any) {
+    private buildServicesFor(name: string, packet: any, txt: KeyValue, referer: any, receiveTime: number) {
         var records = packet.answers.concat(packet.additionals).filter( (rr: ServiceRecord) => rr.ttl > 0) // ignore goodbye messages
 
         return records
@@ -225,7 +229,9 @@ export class Browser extends EventEmitter {
           .map((ptr: ServiceRecord) => {
             const service: KeyValue = {
               addresses: [],
-              subtypes: []
+              subtypes: [],
+              ttl: ptr.ttl,
+              lastSeen: receiveTime
             }
 
             records.filter((rr: ServiceRecord) => {
