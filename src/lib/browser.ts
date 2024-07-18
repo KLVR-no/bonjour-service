@@ -75,6 +75,9 @@ export class Browser extends EventEmitter {
         this.start()
     }
 
+    /**
+     * Start looking for matching services.
+     */
     public start() {
         if (this.onresponse || this.name === undefined) return
 
@@ -123,6 +126,9 @@ export class Browser extends EventEmitter {
         this.update()
     }
 
+    /**
+     * Stop looking for matching services.
+     */
     public stop() {
         if (!this.onresponse) return
 
@@ -130,17 +136,23 @@ export class Browser extends EventEmitter {
         this.onresponse = undefined
     }
 
+    /**
+     * Broadcast the query again.
+     */
     public update() {
         this.mdns.query(this.name, 'PTR')
     }
 
+    /**
+     * Check any services for an expired TTL and emit stop events.
+     */
     public expire() {
         const currentTime = Date.now()
 
         this._services = this._services.filter((service) => {
             // @ts-expect-error Types are wrong here
             if (!service.ttl) return true // No expiry
-            
+
             // @ts-expect-error Types are wrong here
             const expireTime = service.lastSeen + service.ttl * 1000
 
@@ -153,6 +165,9 @@ export class Browser extends EventEmitter {
         })
     }
 
+    /**
+     * An array of services known by the browser to be online.
+     */
     public get services() {
         return this._services;
     }

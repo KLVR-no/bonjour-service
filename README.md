@@ -127,7 +127,7 @@ Emitted every time an existing service does a new announcement with an updated S
 
 Emitted every time an existing service does a new announcement with an updated TXT record.
 
-#### `browser.services()`
+#### `browser.services`
 
 An array of services known by the browser to be online.
 
