@@ -19,6 +19,7 @@ export interface ServiceConfig {
     fqdn?       : string
     subtypes?   : Array<string>
     txt?        : KeyValue
+    ttl?        : number
 
     probe?      : boolean
     disableIPv6?: boolean
@@ -47,6 +48,7 @@ export class Service extends EventEmitter {
     public host         : string
     public fqdn         : string
     public txt?         : any
+    public ttl?         : number
     public subtypes?    : Array<string>
     public addresses?   : Array<string>
     public referer?     : ServiceReferer
@@ -79,6 +81,7 @@ export class Service extends EventEmitter {
         this.host           = config.host || os.hostname()
         this.fqdn           = `${this.name}.${this.type}${TLD}`
         this.txt            = config.txt
+        this.ttl            = config.ttl
         this.subtypes       = config.subtypes
         this.disableIPv6    = !!config.disableIPv6
     }
@@ -123,7 +126,7 @@ export class Service extends EventEmitter {
         return {
             name    : `${service.type}${TLD}`,
             type    : 'PTR',
-            ttl     : 28800,
+            ttl     : service.ttl ?? 28800,
             data    : service.fqdn
         }
     }
@@ -138,7 +141,7 @@ export class Service extends EventEmitter {
         return {
             name: `_${subtype}._sub.${service.type}${TLD}`,
             type: 'PTR',
-            ttl: 28800,
+            ttl: service.ttl ?? 28800,
             data: `${service.name}.${service.type}${TLD}`
         }
     }
@@ -152,7 +155,7 @@ export class Service extends EventEmitter {
         return {
             name    : service.fqdn,
             type    : 'SRV',
-            ttl     : 120,
+            ttl     : service.ttl ?? 120,
             data: {
                 port    : service.port,
                 target  : service.host
@@ -169,7 +172,7 @@ export class Service extends EventEmitter {
         return {
             name    : service.fqdn,
             type    : 'TXT',
-            ttl     : 4500,
+            ttl     : service.ttl ?? 4500,
             data    : this.txtService.encode(service.txt)
         }
     }
@@ -184,7 +187,7 @@ export class Service extends EventEmitter {
         return {
             name    : service.host,
             type    : 'A',
-            ttl     : 120,
+            ttl     : service.ttl ?? 120,
             data    : ip
         }
     }
@@ -199,7 +202,7 @@ export class Service extends EventEmitter {
         return {
             name    : service.host,
             type    : 'AAAA',
-            ttl     : 120,
+            ttl     : service.ttl ?? 120,
             data    : ip
         }
     }
