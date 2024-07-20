@@ -157,7 +157,6 @@ export class Browser extends EventEmitter<BrowserEvents> {
         const currentTime = Date.now()
 
         this._services = this._services.filter((service) => {
-            // @ts-expect-error Types are wrong here
             if (!service.ttl) return true // No expiry
 
             // @ts-expect-error Types are wrong here

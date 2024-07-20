@@ -2,6 +2,10 @@ import dnsEqual                                     from './utils/dns-equal'
 import Server                                       from './mdns-server'
 import Service, { ServiceConfig, ServiceRecord }    from './service'
 
+export interface PublishOptions {
+    announceOnInterval?: number
+}
+
 const REANNOUNCE_MAX_MS : number    = 60 * 60 * 1000
 const REANNOUNCE_FACTOR : number    = 3
 const noop = function () {}
@@ -15,7 +19,7 @@ export class Registry {
         this.server = server
     }
 
-    public publish(config: ServiceConfig): Service {
+    public publish(config: ServiceConfig, options?: PublishOptions): Service {
 
         function start(service: Service, registry: Registry, opts?: { probe: boolean }) {
             if (service.activated) return
@@ -32,10 +36,10 @@ export class Registry {
                         console.log(new Error('Service name is already in use on the network'))
                         return
                     }
-                    registry.announce(registry.server, service)
+                    registry.announce(registry.server, service, options)
                 })
             } else {
-                registry.announce(registry.server, service)
+                registry.announce(registry.server, service, options)
             }
         }
         
@@ -127,7 +131,7 @@ export class Registry {
      * Broadcasts right away, then after 3 seconds, 9 seconds, 27 seconds,
      * and so on, up to a maximum interval of one hour.
      */
-    private announce (server: Server, service: Service) {
+    private announce (server: Server, service: Service, options: PublishOptions | undefined) {
         var delay = 1000
         var packet: Array<ServiceRecord> = service.records()
     
@@ -145,8 +149,11 @@ export class Registry {
                     service.published = true
                     service.emit('up')
                 }
+                
                 delay = delay * REANNOUNCE_FACTOR
-                if (delay < REANNOUNCE_MAX_MS && !service.destroyed) {
+                if (options?.announceOnInterval) delay = options.announceOnInterval
+
+                if (delay > 0 && delay < REANNOUNCE_MAX_MS && !service.destroyed) {
                     setTimeout(broadcast, delay).unref()
                 }
             })
