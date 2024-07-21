@@ -1,5 +1,5 @@
 
-import Registry                                     from './lib/registry'
+import Registry, { PublishOptions }                                     from './lib/registry'
 import Server                                       from './lib/mdns-server'
 import Browser, { BrowserConfig }                   from './lib/browser'
 import Service, { ServiceConfig, ServiceReferer }   from './lib/service'
@@ -24,8 +24,8 @@ export class Bonjour {
      * @param opts
      * @returns
      */
-    public publish(opts: ServiceConfig): Service {
-        return this.registry.publish(opts)
+    public publish(opts: ServiceConfig, options?: PublishOptions): Service {
+        return this.registry.publish(opts, options)
     }
 
     /**
