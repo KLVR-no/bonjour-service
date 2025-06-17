@@ -1,6 +1,6 @@
 {
-  "name": "@julusian/bonjour-service",
-  "version": "1.3.0-2",
+  "name": "@KLVR-no/bonjour-service",
+  "version": "1.3.0-3",
   "description": "A Bonjour/Zeroconf implementation in TypeScript",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -23,11 +23,13 @@
     "test": "standard --fix && tape test/*.js",
     "build": "tsc --removeComments true",
     "dev": "ts-node-dev --respawn --transpile-only ./src/index.ts",
-    "example:simple": "node examples/simple"
+    "example:simple": "node examples/simple",
+    "build:component": "yarn build",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/julusian/bonjour-service.git"
+    "url": "https://github.com/KLVR-no/bonjour-service.git"
   },
   "keywords": [
     "bonjour",
