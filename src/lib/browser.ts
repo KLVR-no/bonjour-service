@@ -193,6 +193,7 @@ export class Browser extends EventEmitter<BrowserEvents> {
             || existingService.port !== newService.port
             || existingService.type !== newService.type
             || existingService.protocol !== newService.protocol
+            || existingService.addresses?.toString() !== newService.addresses?.toString()
         ){
             // replace service
             this.replaceService(newService)
